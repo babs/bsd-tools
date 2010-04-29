@@ -1,0 +1,29 @@
+#!/bin/sh
+
+stripcom() {
+  local _file="$1"
+  local _line
+  {
+     while read _line ; do
+       _line=${_line%%#*}              # strip comments
+       test -z "$_line" && continue
+       echo $_line
+     done
+  } < $_file
+}
+
+
+set -- `stripcom /etc/sysctl.conf`
+while [ $# -ge 1 ] ; do
+  sysctl $1
+  # update limits if needed
+  case $1 in
+  kern.maxproc=*)
+    update_limit -p maxproc
+    ;;
+  kern.maxfiles=*)
+    update_limit -n openfiles
+    ;;
+  esac
+  shift
+done

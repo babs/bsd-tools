@@ -1,0 +1,18 @@
+#!/bin/sh
+
+. /etc/remote.mk
+
+MAIL_OPTS=-E
+ME=$(hostname -s)
+
+[ x"$1" = x"" ] && echo "No file provided, aborting." && exit 1
+
+MOD="$1"
+ORG=$(dirname "$MOD")/backup.$(basename "$MOD")
+
+[ ! -e "$MOD" ] && echo "File '$MOD' not found, aborting." && exit 1
+[ ! -e "$ORG" ] && echo "Not backup file found, creating it empty to get diff working." && touch $ORG
+
+diff -Nru "$ORG" "$MOD" | mail $MAIL_OPTS -s "File change on $ME: $MOD ($(date "+%Y/%m/%d %H:%M:%S %Z"))" $MAILTO
+
+
