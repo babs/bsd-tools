@@ -1,4 +1,4 @@
-CARP_SRC    != find . -name "hostname.carp[0-9]*" | grep -E 'hostname.carp[0-9]+$' | sed -e 's,\./,,'
+CARP_SRC    != find . -name 'hostname.carp[0-9]*' | grep -E 'hostname.carp[0-9]+$$' | sed -e 's,\./,,'
 ISAKMPD_SRC != find isakmpd/ -type f | sed -e 's,\./,,'
 PF_SRC      != ls pf.conf*
 RSYNC_OPTS=-auPq
@@ -10,6 +10,10 @@ DYN_TARGETS += backup.${_carp}
 .endfor
 
 include remote.mk
+
+.if defined(REMOTE) && empty(REMOTE)
+.	undef REMOTE
+.endif
 
 all: show backup.pf.conf backup.Makefile backup.apply_sysctl backup.sysctl.conf backup.rc.conf.local backup.ipsec.conf backup.mail_diff backup.update_carp.sh $(DYN_TARGETS)
 
